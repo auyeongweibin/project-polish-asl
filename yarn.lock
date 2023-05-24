@@ -216,13 +216,6 @@
   dependencies:
     rimraf "^3.0.2"
 
-"@tensorflow-models/hand-pose-detection@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@tensorflow-models/hand-pose-detection/-/hand-pose-detection-2.0.0.tgz#967b26d17d26454d0625c2af2264fd7aad8fdc35"
-  integrity sha512-wAiu/SpigjKuhlEdIvPp84FyzIH0v8kHn/jB/VslUn/pV75Kpsv8Jk0S55oC/Jj54B/fLDZU19+zYN7lQMBCxg==
-  dependencies:
-    rimraf "^3.0.2"
-
 "@tensorflow/tfjs-backend-cpu@4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-backend-cpu/-/tfjs-backend-cpu-4.6.0.tgz#c2cb473596d3813143048f08d3fa6f9bf8d28b35"
@@ -2301,6 +2294,11 @@ react-is@^16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+react-webcam@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/react-webcam/-/react-webcam-7.0.1.tgz#8249e1d621eb4bba7e3f52135f562439d0528df3"
+  integrity sha512-8E/Eb/7ksKwn5QdLn67tOR7+TdP9BZdu6E5/DSt20v8yfW/s0VGBigE6VA7R4278mBuBUowovAB3DkCfVmSPvA==
 
 react@18.2.0:
   version "18.2.0"

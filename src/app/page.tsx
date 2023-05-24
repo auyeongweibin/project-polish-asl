@@ -1,30 +1,75 @@
 "use client";
 
 import Image from 'next/image';
+import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
-import { useEffect, useRef, useState } from 'react';
-import { createDetector, SupportedModels } from "@tensorflow-models/hand-pose-detection";
+import Webcam from "react-webcam";
+import {drawRect} from "./draw"; 
+
+const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y']
 
 export default function Home() {
+  const webcamRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const initialise = async () => {
+    const box = await tf.loadGraphModel('https://tensorflowjsrealtimemodel.s3.au-syd.cloud-object-storage.appdomain.cloud/model.json');
+    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/model.json');
+    
+    setInterval(() => {
+      detect(model, box);
+    }, 100.0);
+  };
 
-  const getVideoStream = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (error) {
-      console.error('Error accessing webcam:', error);
+  const detect = async (model: any, box: any) => {
+    if (
+      typeof webcamRef.current !== "undefined" &&
+      webcamRef.current !== null &&
+      webcamRef.current['video']['readyState'] === 4 &&
+      canvasRef.current !== null
+    ) {
+      // Get Video Properties
+      const video = webcamRef.current['video'];
+      const videoWidth = webcamRef.current['video']['videoWidth'];
+      const videoHeight = webcamRef.current['video']['videoHeight'];
+
+      // Set video width
+      webcamRef.current['video']['width'] = videoWidth;
+      webcamRef.current['video']['height'] = videoHeight;
+
+      // Set canvas height and width
+      canvasRef.current!['width'] = videoWidth;
+      canvasRef.current!['height'] = videoHeight;
+
+      const img = tf.browser.fromPixels(video)
+      const resized = tf.image.resizeBilinear(img, [28,28])
+      const greyscaled = resized.mean(2).toFloat().expandDims(0).expandDims(-1)
+      const casted = resized.cast('int32')
+      const expanded = casted.expandDims(0)
+      const lines = await box.executeAsync(expanded)
+      const obj = await model.executeAsync(greyscaled)
+
+      const scores = await obj.array();
+      const boxes = await lines[1].array()
+      // const classes = await obj[2].array()
+      // const scores = await obj[4].array()
+      
+      const ctx = canvasRef.current.getContext('2d');
+
+      requestAnimationFrame(()=>{drawRect(boxes[0], scores[0], 0.8, videoWidth, videoHeight, ctx)}); 
+
+      tf.dispose(img)
+      tf.dispose(resized)
+      tf.dispose(greyscaled)
+      tf.dispose(casted)
+      tf.dispose(expanded)
+      tf.dispose(lines)
+      tf.dispose(obj)
+
     }
-  };  
+  };
 
-
-  useEffect(() => {
-    getVideoStream();
-  }, []);
-  
+  useEffect(()=>{initialise()},[]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -40,7 +85,7 @@ export default function Home() {
             <Image
               src="/smubia.png"
               alt="Vercel Logo"
-              className="dark:invert"
+              // className="dark:invert"
               width={100}
               height={24}
               priority
@@ -48,13 +93,39 @@ export default function Home() {
           </a>
         </div>
       </div>
-
+      <Webcam
+        ref={webcamRef}
+        muted={true} 
+        style={{
+          position: "absolute",
+          marginLeft: "auto",
+          marginRight: "auto",
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 9,
+          width: 640,
+          height: 480,
+        }}
+      />
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          marginLeft: "auto",
+          marginRight: "auto",
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 10,
+          width: 640,
+          height: 480,
+        }}
+      />
       <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 before:lg:h-[360px]">
-        <video ref={videoRef} autoPlay playsInline />
       </div>
-
       <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
       </div>
     </main>
-  )
+  );
 }
