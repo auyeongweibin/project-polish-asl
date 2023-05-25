@@ -6,22 +6,20 @@ import * as tf from "@tensorflow/tfjs";
 import Webcam from "react-webcam";
 import {drawRect} from "./draw"; 
 
-const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y']
-
 export default function Home() {
   const webcamRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const initialise = async () => {
-    const box = await tf.loadGraphModel('https://tensorflowjsrealtimemodel.s3.au-syd.cloud-object-storage.appdomain.cloud/model.json');
-    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/model.json');
+
+    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/yolov8n.json')
     
     setInterval(() => {
-      detect(model, box);
-    }, 100.0);
+      detect(model);
+    }, 1000.0);
   };
 
-  const detect = async (model: any, box: any) => {
+  const detect = async (model: any) => {
     if (
       typeof webcamRef.current !== "undefined" &&
       webcamRef.current !== null &&
@@ -42,28 +40,17 @@ export default function Home() {
       canvasRef.current!['height'] = videoHeight;
 
       const img = tf.browser.fromPixels(video)
-      const resized = tf.image.resizeBilinear(img, [28,28])
-      const greyscaled = resized.mean(2).toFloat().expandDims(0).expandDims(-1)
-      const casted = resized.cast('int32')
-      const expanded = casted.expandDims(0)
-      const lines = await box.executeAsync(expanded)
-      const obj = await model.executeAsync(greyscaled)
+      const resized = tf.image.resizeBilinear(img, [800,800]).expandDims(0)
+      const obj = await model.execute(resized)
 
-      const scores = await obj.array();
-      const boxes = await lines[1].array()
-      // const classes = await obj[2].array()
-      // const scores = await obj[4].array()
+      const predictions = await obj.array()
       
-      const ctx = canvasRef.current.getContext('2d');
+      // const ctx = canvasRef.current.getContext('2d');
 
-      requestAnimationFrame(()=>{drawRect(boxes[0], scores[0], 0.8, videoWidth, videoHeight, ctx)}); 
+      // requestAnimationFrame(()=>{drawRect(boxes[0], scores[0], 0.8, videoWidth, videoHeight, ctx)}); 
 
       tf.dispose(img)
       tf.dispose(resized)
-      tf.dispose(greyscaled)
-      tf.dispose(casted)
-      tf.dispose(expanded)
-      tf.dispose(lines)
       tf.dispose(obj)
 
     }
