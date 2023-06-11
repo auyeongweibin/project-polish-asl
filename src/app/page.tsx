@@ -12,14 +12,15 @@ export default function Home() {
 
   const initialise = async () => {
 
-    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/yolov8n.json')
-    
+    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/yolov8n.json');
+    const net = await tf.loadGraphModel('https://livelong.s3.au-syd.cloud-object-storage.appdomain.cloud/model.json');
+
     setInterval(() => {
-      detect(model);
-    }, 1000.0);
+      detect(model, net);
+    }, 40.0);
   };
 
-  const detect = async (model: any) => {
+  const detect = async (model: any, net: any) => {
     if (
       typeof webcamRef.current !== "undefined" &&
       webcamRef.current !== null &&
@@ -39,15 +40,18 @@ export default function Home() {
       canvasRef.current!['width'] = videoWidth;
       canvasRef.current!['height'] = videoHeight;
 
-      const img = tf.browser.fromPixels(video)
-      const resized = tf.image.resizeBilinear(img, [800,800]).expandDims(0)
-      const obj = await model.execute(resized)
+      const img = tf.browser.fromPixels(video);
+      const resized = tf.image.resizeBilinear(img, [800,800]).expandDims(0);
+      const obj = await model.execute(resized);
 
-      const predictions = await obj.array()
+      const result = await obj.array();
+
+      const boxes = result[0].slice(0, 4)[0].map((_: any, colIndex: any) => result[0].slice(0, 4).map(row => row[colIndex]));
+      const scores = result[0].slice(4)[0].map((_: any, colIndex: any) => result[0].slice(4).map(row => row[colIndex]));
       
-      // const ctx = canvasRef.current.getContext('2d');
+      const ctx = canvasRef.current.getContext('2d');
 
-      // requestAnimationFrame(()=>{drawRect(boxes[0], scores[0], 0.8, videoWidth, videoHeight, ctx)}); 
+      requestAnimationFrame(()=>{drawRect(boxes, scores, 0.8, videoWidth, videoHeight, ctx)}); 
 
       tf.dispose(img)
       tf.dispose(resized)
