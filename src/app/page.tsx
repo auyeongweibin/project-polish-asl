@@ -17,7 +17,7 @@ export default function Home() {
 
     setInterval(() => {
       detect(model, net);
-    }, 2000.0);
+    }, 500.0);
   };
 
   const detect = async (model: any, net: any) => {
