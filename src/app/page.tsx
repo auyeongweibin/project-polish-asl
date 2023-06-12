@@ -17,7 +17,7 @@ export default function Home() {
 
     setInterval(() => {
       detect(model, net);
-    }, 40.0);
+    }, 2000.0);
   };
 
   const detect = async (model: any, net: any) => {
@@ -46,8 +46,8 @@ export default function Home() {
 
       const result = await obj.array();
 
-      const boxes = result[0].slice(0, 4)[0].map((_: any, colIndex: any) => result[0].slice(0, 4).map(row => row[colIndex]));
-      const scores = result[0].slice(4)[0].map((_: any, colIndex: any) => result[0].slice(4).map(row => row[colIndex]));
+      const boxes = result[0].slice(0, 4)[0].map((_: any, colIndex: any) => result[0].slice(0, 4).map((row: Array<number>) => row[colIndex]));
+      const scores = result[0].slice(4)[0].map((_: any, colIndex: any) => result[0].slice(4).map((row: Array<number>) => row[colIndex]));
       
       const ctx = canvasRef.current.getContext('2d');
 

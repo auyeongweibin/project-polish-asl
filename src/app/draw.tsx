@@ -17,46 +17,20 @@ function sortIndicesByLargestValue(arr: Array<Array<number>>) {
   return indices;
 }
 
-export const drawRect = (boxes: Array<Array<number>>, scores: Array<Array<number>>, threshold: number, imgWidth: number, imgHeight: number, ctx: any)=>{
+export const drawRect = async (boxes: Array<Array<number>>, scores: Array<Array<number>>, threshold: number, imgWidth: number, imgHeight: number, ctx: any)=>{
 
   const maxScores = scores.map(row => Math.max(...row))
 
-  const result = tf.image.nonMaxSuppressionWithScore(boxes, maxScores, 1, 0.5, threshold)
+  const result = await tf.image.nonMaxSuppressionWithScoreAsync(boxes, maxScores, 1, 0.5, threshold);
 
-  const index = result['selectedIndices'].arraySync();
-  const score = result['selectedScores'].arraySync();
-  const character = alphabet[scores[index[0]].indexOf(Math.max(...scores[index[0]]))]
-
-  // const scores = result[0].map((_: any, colIndex: any) => result.map(row => row[colIndex]));
-  // const indices = sortIndicesByLargestValue(scores);
-  // for(let i=0; i<=result.length; i++){
-  //   const score = scores[indices[i]].slice(4);
-  //   const index = score.indexOf(Math.max.apply(null, score));
-    
-  //   if(score[index]>threshold){
-
-  //       // Extract variables
-  //       const [x,y,height,width] = scores[indices[i]].slice(0, 4);
-
-  //       // Set styling
-  //       ctx.strokeStyle = 'green'
-  //       ctx.lineWidth = 2
-  //       ctx.fillStyle = 'white'
-  //       ctx.font = '30px Arial'   
-        
-  //       // DRAW!!
-  //       ctx.beginPath()
-  //       ctx.fillText(alphabet[index] + "-" + score[index], x, y-10)
-  //       // ctx.rect(x*imgWidth, y*imgHeight, width*imgWidth/2, height*imgHeight/2);
-  //       ctx.rect(x, y, width, height);
-  //       ctx.stroke()
-  //   } else {
-  //       break;
-  //   }
-  // }
+  let index: number = result['selectedIndices'].dataSync()[0];;
+  let score: number = result['selectedScores'].dataSync()[0];
+  let character : string = alphabet[scores[index].indexOf(Math.max(...scores[index]))];
 
   // Extract variables
-  const [x,y,height,width] = boxes[index[0]];
+  const [x,y,height,width] = boxes[index];
+  // console.log([x,y,height,width]);
+  // console.log("Character: " + character)
 
   // Set styling
   ctx.strokeStyle = 'green'
@@ -66,7 +40,7 @@ export const drawRect = (boxes: Array<Array<number>>, scores: Array<Array<number
   
   // DRAW!!
   ctx.beginPath()
-  ctx.fillText(character + "-" + score[0], x, y-10)
+  ctx.fillText(character + "-" + score, x, y-10)
   // ctx.rect(x*imgWidth, y*imgHeight, width*imgWidth/2, height*imgHeight/2);
   ctx.rect(x, y, width, height);
   ctx.stroke()
