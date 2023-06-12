@@ -12,15 +12,14 @@ export default function Home() {
 
   const initialise = async () => {
 
-    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/yolov8n.json');
-    const net = await tf.loadGraphModel('https://livelong.s3.au-syd.cloud-object-storage.appdomain.cloud/model.json');
+    const model = await tf.loadGraphModel('https://objectstorage.ap-singapore-1.oraclecloud.com/n/ax7maqnmi2u7/b/project-polish-asl/o/model.json');
 
     setInterval(() => {
-      detect(model, net);
+      detect(model);
     }, 500.0);
   };
 
-  const detect = async (model: any, net: any) => {
+  const detect = async (model: any) => {
     if (
       typeof webcamRef.current !== "undefined" &&
       webcamRef.current !== null &&
@@ -41,7 +40,7 @@ export default function Home() {
       canvasRef.current!['height'] = videoHeight;
 
       const img = tf.browser.fromPixels(video);
-      const resized = tf.image.resizeBilinear(img, [800,800]).expandDims(0);
+      const resized = tf.image.resizeBilinear(img, [384,384]).expandDims(0);
       const obj = await model.execute(resized);
 
       const result = await obj.array();
@@ -53,9 +52,10 @@ export default function Home() {
 
       requestAnimationFrame(()=>{drawRect(boxes, scores, 0.8, videoWidth, videoHeight, ctx)}); 
 
-      tf.dispose(img)
-      tf.dispose(resized)
-      tf.dispose(obj)
+      tf.dispose(img);
+      tf.dispose(resized);
+      tf.dispose(obj);
+      tf.dispose(result);
 
     }
   };
