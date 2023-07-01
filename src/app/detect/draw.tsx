@@ -108,7 +108,7 @@ export const detectVideo = (videoSource: any, model: any, canvasRef: any) => {
     ctx.fillStyle = 'white'
     ctx.font = '14px Arial'   
       
-    output.slice(0, 5).forEach((r:Array<number>) => {
+    output.forEach((r:Array<number>) => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
 
       const [x1, y1, x2, y2, _, label] = r
@@ -123,21 +123,7 @@ export const detectVideo = (videoSource: any, model: any, canvasRef: any) => {
       ctx.rect(x, y, w, h);
       ctx.stroke()
     });
-
-    // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
-
-    // const [y1, x1, y2, x2, _, label] = output[0]
-    // const y = Math.floor(y1)
-    // const x = Math.floor(x1)
-    // const h = Math.round(y2) 
-    // const w = Math.round(x2)
-
-    // // DRAW!!
-    // ctx.beginPath()
-    // ctx.fillText(alphabet[label], x, y-10);
-    // ctx.rect(x, y, w-x, h-y);
-    // ctx.stroke()
-
+    
     requestAnimationFrame(detect);
   
     tf.engine().endScope(); // end of scoping
