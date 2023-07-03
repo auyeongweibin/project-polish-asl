@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Home() {
+export default function Tutorial() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
           <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -26,16 +26,14 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <Link href="/tutorial">
-            <text className="animate-pulse text-6xl font-mono
-            ">
-                Project Polish - ASL
+          <text className='text-6xl'>
+            Tutorial
+          </text>
+          <Link href="/detect">
+            <text className="text-xl">
+                Skip Tutorial
             </text>
           </Link>
-          <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 before:lg:h-[360px]">
-          </div>
-          {/* <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-          </div> */}
         </main>
       );
 }

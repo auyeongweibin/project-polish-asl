@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl"; 
-import {detectVideo} from "./draw"; 
+import {detectVideo} from "./utils/draw"; 
 
 export default function Detect() {
   const cameraRef = useRef<HTMLVideoElement>(null);
